@@ -155,7 +155,7 @@ export const CutSheetModal: React.FC<CutSheetModalProps> = ({
         </div>
 
         {/* Content Body */}
-        <div className="flex-1 overflow-auto p-6">
+        <div className="flex-1 overflow-auto p-4 sm:p-6">
           {activeTab === 'cutsheet' ? (
             project.wires.length === 0 ? (
               <div className="text-center py-16 text-slate-500">
@@ -166,22 +166,23 @@ export const CutSheetModal: React.FC<CutSheetModalProps> = ({
                 </p>
               </div>
             ) : (
-              <table className="w-full text-left text-xs border-collapse">
-                <thead>
-                  <tr className="border-b border-slate-700 text-slate-400 text-[11px] uppercase tracking-wider bg-slate-900/60 sticky top-0">
-                    <th className="py-2.5 px-3">Wire ID</th>
-                    <th className="py-2.5 px-3">Function / Signal</th>
-                    <th className="py-2.5 px-3">Color</th>
-                    <th className="py-2.5 px-3">Gauge</th>
-                    <th className="py-2.5 px-3">From Term</th>
-                    <th className="py-2.5 px-3">To Term</th>
-                    <th className="py-2.5 px-3 text-right">Measured</th>
-                    <th className="py-2.5 px-3 text-right">Slack</th>
-                    <th className="py-2.5 px-3 text-right font-semibold text-emerald-400">Total Cut</th>
-                    <th className="py-2.5 px-3">Sleeve</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-800">
+              <div className="overflow-x-auto rounded-lg border border-slate-800">
+                <table className="w-full min-w-[700px] text-left text-xs border-collapse">
+                  <thead>
+                    <tr className="border-b border-slate-700 text-slate-400 text-[11px] uppercase tracking-wider bg-slate-900/90 sticky top-0">
+                      <th className="py-2.5 px-3">Wire ID</th>
+                      <th className="py-2.5 px-3">Function / Signal</th>
+                      <th className="py-2.5 px-3">Color</th>
+                      <th className="py-2.5 px-3">Gauge</th>
+                      <th className="py-2.5 px-3">From Term</th>
+                      <th className="py-2.5 px-3">To Term</th>
+                      <th className="py-2.5 px-3 text-right">Measured</th>
+                      <th className="py-2.5 px-3 text-right">Slack</th>
+                      <th className="py-2.5 px-3 text-right font-semibold text-emerald-400">Total Cut</th>
+                      <th className="py-2.5 px-3">Sleeve</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-800 bg-slate-950/40">
                   {filteredWires.map((wire) => {
                     const rawPx = polylineLength(wire.points);
                     const measured = pixelsToReal(rawPx, ref);
@@ -231,7 +232,8 @@ export const CutSheetModal: React.FC<CutSheetModalProps> = ({
                   })}
                 </tbody>
               </table>
-            )
+            </div>
+          )
           ) : (
             /* Spool Summary View */
             <div className="space-y-4">

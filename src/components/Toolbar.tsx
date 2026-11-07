@@ -1,5 +1,5 @@
 import React from 'react';
-import { ToolMode } from '../types/harness';
+import type { ToolMode } from '../types/harness';
 import {
   MousePointer,
   Ruler,
@@ -83,9 +83,9 @@ export const Toolbar: React.FC<ToolbarProps> = ({
   ];
 
   return (
-    <div className="absolute top-4 left-4 z-20 flex flex-col space-y-2 pointer-events-auto">
+    <div className="absolute top-3 left-3 z-20 flex flex-col space-y-1.5 pointer-events-auto max-h-[calc(100vh-4rem)] overflow-visible">
       {/* Primary Tool Buttons */}
-      <div className="bg-slate-900/90 backdrop-blur-md border border-slate-700/80 rounded-xl p-1.5 shadow-xl flex flex-col space-y-1">
+      <div className="bg-slate-900/95 backdrop-blur-md border border-slate-700/80 rounded-xl p-1 shadow-2xl flex flex-col space-y-0.5">
         {tools.map((tool) => {
           const Icon = tool.icon;
           const isActive = currentMode === tool.id;
@@ -94,15 +94,15 @@ export const Toolbar: React.FC<ToolbarProps> = ({
               key={tool.id}
               onClick={() => onSelectMode(tool.id)}
               title={`${tool.name} - ${tool.description}`}
-              className={`p-2.5 rounded-lg transition relative flex items-center justify-center group ${
+              className={`p-2 rounded-lg transition relative flex items-center justify-center group ${
                 isActive
                   ? 'bg-sky-500 text-slate-950 font-bold shadow-md shadow-sky-500/30'
                   : 'text-slate-300 hover:text-white hover:bg-slate-800'
               } ${tool.highlight && !isActive ? 'ring-2 ring-amber-400 animate-pulse' : ''}`}
             >
-              <Icon className="w-5 h-5" />
+              <Icon className="w-4 h-4 sm:w-4.5 sm:h-4.5" />
               {/* Tooltip */}
-              <div className="absolute left-full ml-3 px-2.5 py-1.5 bg-slate-900 text-slate-100 text-xs rounded-md shadow-xl border border-slate-700 whitespace-nowrap opacity-0 group-hover:opacity-100 pointer-events-none transition z-30">
+              <div className="absolute left-full ml-2.5 px-2.5 py-1.5 bg-slate-900 text-slate-100 text-xs rounded-md shadow-xl border border-slate-700 whitespace-nowrap opacity-0 group-hover:opacity-100 pointer-events-none transition z-30">
                 <span className="font-semibold block">{tool.name}</span>
                 <span className="text-[10px] text-slate-400">{tool.description}</span>
               </div>
@@ -112,59 +112,59 @@ export const Toolbar: React.FC<ToolbarProps> = ({
       </div>
 
       {/* Undo / Redo / Fit */}
-      <div className="bg-slate-900/90 backdrop-blur-md border border-slate-700/80 rounded-xl p-1 shadow-xl flex flex-col space-y-1">
+      <div className="bg-slate-900/95 backdrop-blur-md border border-slate-700/80 rounded-xl p-1 shadow-xl flex flex-col space-y-0.5">
         <button
           onClick={onUndo}
           disabled={!canUndo}
           title="Undo (Ctrl+Z)"
-          className="p-2 rounded-lg text-slate-300 hover:text-white hover:bg-slate-800 transition disabled:opacity-30 disabled:hover:bg-transparent"
+          className="p-1.5 rounded-lg text-slate-300 hover:text-white hover:bg-slate-800 transition disabled:opacity-30 disabled:hover:bg-transparent"
         >
-          <Undo2 className="w-4 h-4" />
+          <Undo2 className="w-3.5 h-3.5" />
         </button>
         <button
           onClick={onRedo}
           disabled={!canRedo}
           title="Redo (Ctrl+Y)"
-          className="p-2 rounded-lg text-slate-300 hover:text-white hover:bg-slate-800 transition disabled:opacity-30 disabled:hover:bg-transparent"
+          className="p-1.5 rounded-lg text-slate-300 hover:text-white hover:bg-slate-800 transition disabled:opacity-30 disabled:hover:bg-transparent"
         >
-          <Redo2 className="w-4 h-4" />
+          <Redo2 className="w-3.5 h-3.5" />
         </button>
         <button
           onClick={onFitToScreen}
           title="Fit View to Screen"
-          className="p-2 rounded-lg text-slate-300 hover:text-white hover:bg-slate-800 transition"
+          className="p-1.5 rounded-lg text-slate-300 hover:text-white hover:bg-slate-800 transition"
         >
-          <Maximize2 className="w-4 h-4" />
+          <Maximize2 className="w-3.5 h-3.5" />
         </button>
       </div>
 
       {/* When actively drawing a wire */}
       {isDrawingWire && (
-        <div className="bg-sky-950/90 border border-sky-500/50 rounded-xl p-3 shadow-2xl backdrop-blur-md animate-in slide-in-from-left duration-150 w-52">
-          <div className="flex items-center justify-between mb-1.5">
-            <span className="text-xs font-semibold text-sky-300 flex items-center space-x-1.5">
+        <div className="bg-sky-950/95 border border-sky-500/60 rounded-xl p-2.5 shadow-2xl backdrop-blur-md animate-in slide-in-from-left duration-150 w-48 text-xs">
+          <div className="flex items-center justify-between mb-1">
+            <span className="font-semibold text-sky-300 flex items-center space-x-1">
               <Cable className="w-3.5 h-3.5" />
-              <span>Routing Wire</span>
+              <span>Routing</span>
             </span>
-            <span className="text-[10px] bg-sky-900/60 px-1.5 py-0.5 rounded text-sky-200 font-mono">
+            <span className="text-[10px] bg-sky-900/70 px-1.5 py-0.2 rounded text-sky-200 font-mono">
               {drawingWirePointsCount} pts
             </span>
           </div>
-          <p className="text-[11px] text-slate-300 leading-snug mb-2.5">
-            Click to place bends. Double-click or press Enter to finish.
+          <p className="text-[10px] text-slate-300 leading-tight mb-2">
+            Click bends. Double-click or Enter to finish.
           </p>
-          <div className="flex space-x-1.5">
+          <div className="flex space-x-1">
             <button
               onClick={onFinishWire}
               disabled={drawingWirePointsCount < 2}
-              className="flex-1 flex items-center justify-center space-x-1 py-1.5 px-2 bg-emerald-500 hover:bg-emerald-400 text-slate-950 text-xs font-bold rounded-lg transition disabled:opacity-40 disabled:cursor-not-allowed shadow-md shadow-emerald-500/20"
+              className="flex-1 flex items-center justify-center space-x-1 py-1 px-1.5 bg-emerald-500 hover:bg-emerald-400 text-slate-950 text-xs font-bold rounded-lg transition disabled:opacity-40 disabled:cursor-not-allowed shadow-md shadow-emerald-500/20"
             >
               <Check className="w-3.5 h-3.5" />
               <span>Finish</span>
             </button>
             <button
               onClick={onCancelDrawing}
-              className="py-1.5 px-2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-medium rounded-lg transition"
+              className="py-1 px-2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-medium rounded-lg transition"
             >
               Cancel
             </button>
@@ -174,4 +174,3 @@ export const Toolbar: React.FC<ToolbarProps> = ({
     </div>
   );
 };
-

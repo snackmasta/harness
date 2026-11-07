@@ -11,6 +11,7 @@ export interface ReferenceLine {
   realDistance: number; // in chosen unit
   unit: Unit;
   calibrated: boolean;
+  visible?: boolean;
 }
 
 export type WireGauge =
@@ -52,6 +53,8 @@ export interface Connector {
   position: Point;
   pinCount: number;
   color?: string;
+  visible?: boolean;
+  locked?: boolean;
 }
 
 export interface Wire {
@@ -69,8 +72,20 @@ export interface Wire {
   toPin?: string;
   sleeving?: 'None' | 'Heatshrink' | 'Split Loom' | 'Braided Mesh' | 'Spiral Wrap';
   bundleGroup?: string;
+  folderId?: string; // Photoshop-style folder / bundle group
   routingStyle?: 'straight' | 'rounded'; // straight segments or smoothed bends
   notes?: string;
+  visible?: boolean;
+  locked?: boolean;
+}
+
+export interface LayerFolder {
+  id: string;
+  name: string;
+  color?: string;
+  visible?: boolean;
+  locked?: boolean;
+  expanded?: boolean;
 }
 
 export interface QuickDimension {
@@ -78,6 +93,7 @@ export interface QuickDimension {
   p1: Point;
   p2: Point;
   label?: string;
+  visible?: boolean;
 }
 
 export type ToolMode =
@@ -101,6 +117,7 @@ export interface HarnessProject {
   imageDimensions: { width: number; height: number };
   referenceLine: ReferenceLine;
   wires: Wire[];
+  folders?: LayerFolder[];
   connectors: Connector[];
   dimensions: QuickDimension[];
   createdAt: string;

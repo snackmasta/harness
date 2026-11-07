@@ -361,22 +361,22 @@ export const Canvas: React.FC<CanvasProps> = ({
       className={`w-full h-full relative overflow-hidden bg-slate-950 ${getCursorClass()} select-none`}
     >
       {/* Top Banner Guide for active tool */}
-      <div className="absolute top-3 left-1/2 -translate-x-1/2 z-10 pointer-events-none transition-all duration-200">
+      <div className="absolute top-2.5 left-1/2 -translate-x-1/2 z-10 pointer-events-none transition-all duration-200 max-w-[calc(100vw-360px)] px-2">
         {!ref.calibrated ? (
-          <div className="bg-amber-500/90 text-slate-950 font-semibold px-4 py-1.5 rounded-full shadow-lg text-xs flex items-center space-x-2 animate-bounce">
-            <span>⚠️ Scale uncalibrated: Click "Calibrate Scale (C)" and mark a known distance.</span>
+          <div className="bg-amber-500/95 text-slate-950 font-semibold px-3 py-1 rounded-full shadow-lg text-[11px] flex items-center justify-center space-x-1.5 truncate">
+            <span>⚠️ Scale uncalibrated: Click "Calibrate Scale (C)" to mark a known length</span>
           </div>
         ) : toolMode === 'draw_wire' ? (
-          <div className="bg-sky-500/90 text-slate-950 font-semibold px-4 py-1.5 rounded-full shadow-lg text-xs flex items-center space-x-2">
-            <span>⚡ Routing Cable: Click bends along the path &bull; Press Enter or Double-Click to finish</span>
+          <div className="bg-sky-500/95 text-slate-950 font-semibold px-3 py-1 rounded-full shadow-lg text-[11px] flex items-center justify-center space-x-1.5 truncate">
+            <span>⚡ Routing Cable: Click bends &bull; Press Enter or Double-Click to finish</span>
           </div>
         ) : toolMode === 'calibrate' ? (
-          <div className="bg-amber-400/90 text-slate-950 font-semibold px-4 py-1.5 rounded-full shadow-lg text-xs flex items-center space-x-2">
-            <span>📏 Click Point A then Point B to set reference distance (ruler, pitch, or coupon)</span>
+          <div className="bg-amber-400/95 text-slate-950 font-semibold px-3 py-1 rounded-full shadow-lg text-[11px] flex items-center justify-center space-x-1.5 truncate">
+            <span>📏 Click Point A then Point B on a known reference to calibrate</span>
           </div>
         ) : toolMode === 'dimension' ? (
-          <div className="bg-indigo-500/90 text-white font-semibold px-4 py-1.5 rounded-full shadow-lg text-xs flex items-center space-x-2">
-            <span>📐 Click two points to measure real-world distance / clearance</span>
+          <div className="bg-indigo-500/95 text-white font-semibold px-3 py-1 rounded-full shadow-lg text-[11px] flex items-center justify-center space-x-1.5 truncate">
+            <span>📐 Click two points to measure clearance / distance</span>
           </div>
         ) : null}
       </div>
@@ -463,13 +463,14 @@ export const Canvas: React.FC<CanvasProps> = ({
 
           {/* 2. CONNECTORS & TERMINALS */}
           {project.connectors.map((conn) => {
+            if (conn.visible === false) return null;
             return (
               <g
                 key={conn.id}
                 transform={`translate(${conn.position.x}, ${conn.position.y})`}
-                className="cursor-move"
+                className={conn.locked ? 'cursor-default' : 'cursor-move'}
                 onMouseDown={(e) => {
-                  if (toolMode === 'select') {
+                  if (toolMode === 'select' && !conn.locked) {
                     e.stopPropagation();
                     setDraggedItem({ type: 'connector', connectorId: conn.id });
                   }
@@ -510,7 +511,10 @@ export const Canvas: React.FC<CanvasProps> = ({
 
           {/* 3. DRAWN CABLES / HARNESS WIRES */}
           {project.wires.map((wire) => {
+            const parentFolder = wire.folderId ? project.folders?.find((f) => f.id === wire.folderId) : null;
+            if (wire.visible === false || parentFolder?.visible === false) return null;
             const isSelected = selectedWireId === wire.id;
+            const isLocked = wire.locked === true || parentFolder?.locked === true;
             const strokeW = getStrokeWidthForGauge(wire.gauge);
             const pathD =
               wire.routingStyle === 'rounded'
@@ -688,8 +692,8 @@ export const Canvas: React.FC<CanvasProps> = ({
                   </g>
                 )}
 
-                {/* Vertex Bend Handles & Midpoint Add-Vertex Handles (When Selected) */}
-                {isSelected && (
+                {/* Vertex Bend Handles & Midpoint Add-Vertex Handles (When Selected and Unlocked) */}
+                {isSelected && !isLocked && (
                   <g>
                     {/* Draggable Vertex Handles */}
                     {wire.points.map((pt, vIdx) => (
@@ -835,6 +839,7 @@ export const Canvas: React.FC<CanvasProps> = ({
 
           {/* 5. QUICK DIMENSIONS */}
           {project.dimensions.map((dim) => {
+            if (dim.visible === false) return null;
             const rawPx = distance(dim.p1, dim.p2);
             const realDist = pixelsToReal(rawPx, ref);
             const mid = midpoint(dim.p1, dim.p2);
@@ -895,8 +900,9 @@ export const Canvas: React.FC<CanvasProps> = ({
           )}
 
           {/* 6. REFERENCE LINE (CALIBRATION OVERLAY) */}
-          <g id="reference-line-group">
-            {/* The Reference Line Dimension Stroke */}
+          {ref.visible !== false && (
+            <g id="reference-line-group">
+              {/* The Reference Line Dimension Stroke */}
             <line
               x1={ref.p1.x}
               y1={ref.p1.y}
@@ -995,6 +1001,7 @@ export const Canvas: React.FC<CanvasProps> = ({
               );
             })()}
           </g>
+        )}
 
           {/* Active Calibration rubberband when drawing reference line */}
           {calibratingStartPoint && (
